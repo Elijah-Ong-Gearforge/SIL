@@ -18,10 +18,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Google Auth Strategy
+// Update it to this:
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/auth/google/callback"
+    callbackURL: "https://sil-admin-panel.onrender.com/auth/google/callback"
   },
   function(accessToken, refreshToken, profile, cb) {
     return cb(null, profile);
