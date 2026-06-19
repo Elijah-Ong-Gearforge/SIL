@@ -17,8 +17,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Google Auth Strategy
-// Update it to this:
+// Google Auth Strategy 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -37,7 +36,7 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
     require: true,
-    rejectUnauthorized: false // This bypasses the self-signed certificate error
+    rejectUnauthorized: false // Bypasses self-signed certificate chain blocker
   }
 });
 
@@ -47,46 +46,117 @@ const isAdmin = (req, res, next) => {
     return next();
   }
   res.status(403).send(`
-    <body style="font-family:sans-serif; text-align:center; padding-top:100px;">
-      <h1 style="color:#dc2626;">403 Forbidden</h1>
-      <p>You are not the authorized admin. <a href="/auth/google">Switch Account</a></p>
+    <body style="font-family:sans-serif; text-align:center; padding-top:100px; background:#f8fafc; color:#1e293b;">
+      <h1 style="color:#dc2626; font-size:48px; margin-bottom:10px;">403 Forbidden</h1>
+      <p style="font-size:18px; color:#64748b;">You are not the authorized admin for this dashboard.</p>
+      <p><a href="/auth/google" style="color:#2563eb; text-decoration:none; font-weight:600;">Click here to Switch Accounts</a></p>
     </body>
   `);
 };
 
-// Auth Routes
+// Auth Routing Routes
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => res.redirect('/dashboard'));
-app.get('/logout', (req, res, next) => { req.logout((err) => { if(err) return next(err); res.redirect('/'); }); });
 
-// Default Route
-app.get('/', (req, res) => {
-  res.send(`<body style="font-family:sans-serif; text-align:center; padding-top:100px;">
-              <h2>SIL Admin Panel</h2>
-              <a href="/auth/google" style="padding:10px 20px; background:#2563eb; color:white; text-decoration:none; border-radius:5px;">Login with Google</a>
-            </body>`);
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/' }), 
+  (req, res) => res.redirect('/dashboard')
+);
+
+app.get('/logout', (req, res, next) => { 
+  req.logout((err) => { 
+    if(err) return next(err); 
+    res.redirect('/'); 
+  }); 
 });
 
-// Dashboard Route
+// Default Route (Sleek Professional Alps Login Page)
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>SIL Staff Portal - Login</title>
+      <style>
+        body {
+          margin: 0; padding: 0;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+          background: linear-gradient(rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.4)), 
+                      url('https://images.unsplash.com/photo-1531315630201-bb15abeb1653?q=80&w=1200&auto=format&fit=crop');
+          background-size: cover; background-position: center; background-attachment: fixed;
+          display: flex; justify-content: center; align-items: center; height: 100vh;
+        }
+        .login-card {
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+          padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+          width: 100%; max-width: 380px; text-align: center;
+          border: 1px solid rgba(255, 255, 255, 0.3); box-sizing: border-box;
+        }
+        .logo-area { font-size: 22px; font-weight: 800; color: #0f172a; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .tagline { font-size: 14px; color: #475569; margin-bottom: 35px; }
+        .divider { height: 1px; background: #cbd5e1; margin-bottom: 30px; position: relative; }
+        .divider span {
+          position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+          background: #e2e8f0; padding: 0 10px; font-size: 12px; color: #64748b; font-weight: 500; border-radius: 10px;
+        }
+        .btn-google {
+          display: flex; align-items: center; justify-content: center; gap: 12px;
+          width: 100%; padding: 12px; background: #ffffff; color: #1e293b;
+          text-decoration: none; font-weight: 600; font-size: 15px; border-radius: 8px;
+          border: 1px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.2s ease; box-sizing: border-box;
+        }
+        .btn-google:hover {
+          background: #f8fafc; border-color: #94a3b8; transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+        }
+        .btn-google img { width: 18px; height: 18px; }
+        .footer-note { margin-top: 35px; font-size: 11px; color: #64748b; line-height: 1.4; }
+      </style>
+    </head>
+    <body>
+      <div class="login-card">
+        <div class="logo-area">SINGAPORE INFORMATICS LEAGUE</div>
+        <div class="tagline">Official Committee Portal</div>
+        <div class="divider"><span>STAFF SECURE ACCESS</span></div>
+        <a href="/auth/google" class="btn-google">
+          <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/web-24dp/copy_of_24dp.png" alt="Google Logo">
+          Sign in with Google
+        </a>
+        <div class="footer-note">
+          This system is restricted to authorized SIL personnel only. Unauthorized access attempts are monitored and logged.
+        </div>
+      </div>
+    </body>
+    </html>
+  `);
+});
+
+// Dashboard Route (Beautiful SaaS Layout)
 app.get('/dashboard', isAdmin, async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM sil_applicants ORDER BY applied_at DESC');
     
+    // Map data rows with beautiful structural formatting
     let rows = result.rows.map(app => `
       <tr>
-        <td><b>${app.full_name}</b></td>
-        <td><a href="mailto:${app.email}">${app.email}</a></td>
+        <td>
+          <strong style="font-size: 15px; color: var(--text-dark);">${app.full_name}</strong><br>
+          <a href="mailto:${app.email}" class="text-link" style="font-size: 13px;">${app.email}</a>
+        </td>
         <td>${app.school}</td>
-        <td style="background: #eff6ff; font-weight: 500;">${app.discord_tag}</td>
-        <td>${app.phone_number || 'N/A'}</td>
-        <td>${app.languages}</td>
-        <td>${app.past_contests ? app.past_contests.replace(/\n/g, '<br>') : 'None'}</td>
-        <td>${app.past_works_workshops ? app.past_works_workshops.replace(/\n/g, '<br>') : 'None'}</td>
-        <td><span style="color:#16a34a; font-weight:bold;">✓ Cleared</span></td>
+        <td>
+          <span class="badge-discord">${app.discord_tag}</span><br>
+          <span style="font-size: 12px; color: var(--text-muted); display:inline-block; margin-top:4px;">${app.phone_number || 'No Phone'}</span>
+        </td>
+        <td><code style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-weight:500; color:#0f172a;">${app.languages}</code></td>
+        <td style="max-width: 220px; font-size: 13px; color: var(--text-dark);">${app.past_contests ? app.past_contests.replace(/\n/g, '<br>') : '<span style="color:#9ca3af;">None</span>'}</td>
+        <td style="max-width: 220px; font-size: 13px; color: var(--text-dark);">${app.past_works_workshops ? app.past_works_workshops.replace(/\n/g, '<br>') : '<span style="color:#9ca3af;">None</span>'}</td>
+        <td><span class="badge-status">✓ Cleared</span></td>
       </tr>
     `).join('');
 
-res.send(`
+    res.send(`
       <!DOCTYPE html>
       <html lang="en">
       <head>
@@ -103,142 +173,56 @@ res.send(`
             --accent-hover: #1d4ed8;
             --border: #e2e8f0;
           }
-          
           body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background: var(--bg-main); 
-            margin: 0; 
-            display: flex;
-            min-height: 100vh;
-            color: var(--text-dark);
+            background: var(--bg-main); margin: 0; display: flex; min-height: 100vh; color: var(--text-dark);
           }
-
-          /* Sidebar Layout */
           .sidebar {
-            width: 260px;
-            background: var(--sidebar-bg);
-            color: white;
-            padding: 30px 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-sizing: border-box;
+            width: 260px; background: var(--sidebar-bg); color: white; padding: 30px 20px;
+            display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
           }
-          .sidebar-brand {
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 40px;
-            color: #f8fafc;
-          }
-          .admin-profile {
-            background: rgba(255,255,255,0.05);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
-          }
-          .admin-email {
-            font-weight: 600;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-          .logout-btn {
-            display: inline-block;
-            margin-top: 8px;
-            color: #f87171;
-            text-decoration: none;
-          }
+          .sidebar-brand { font-size: 20px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 40px; color: #f8fafc; }
+          .admin-profile { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; font-size: 13px; }
+          .admin-email { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+          .logout-btn { display: inline-block; margin-top: 8px; color: #f87171; text-decoration: none; }
           .logout-btn:hover { text-decoration: underline; }
-
-          /* Main Content Area */
-          .main-content {
-            flex-1;
-            width: calc(100% - 260px);
-            padding: 40px;
-            box-sizing: border-box;
-          }
-          .header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-          }
+          .main-content { flex: 1; width: calc(100% - 260px); padding: 40px; box-sizing: border-box; }
+          .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
           h2 { margin: 0; font-size: 28px; font-weight: 700; }
-          
-          /* Stats Card */
           .stats-card {
-            background: white;
-            padding: 20px 24px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid var(--border);
-            display: inline-block;
-            margin-bottom: 24px;
+            background: white; padding: 20px 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border); display: inline-block; margin-bottom: 24px;
           }
           .stats-label { font-size: 14px; color: var(--text-muted); font-weight: 500; }
           .stats-val { font-size: 32px; font-weight: 700; color: var(--accent); margin-top: 4px; }
-
-          /* Table Styling */
-          .table-container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            border: 1px solid var(--border);
-            overflow: hidden;
-          }
+          .table-container { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); overflow: hidden; }
           table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
           th { background: #f1f5f9; padding: 16px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border); }
           td { padding: 16px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
           tr:last-child td { border-bottom: none; }
           tr:hover { background: #f8fafc; }
-
-          /* Custom Badges */
-          .badge-discord {
-            background: #eef2ff;
-            color: #4338ca;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 13px;
-            display: inline-block;
-          }
-          .badge-status {
-            background: #f0fdf4;
-            color: #16a34a;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 12px;
-          }
+          .badge-discord { background: #eef2ff; color: #4338ca; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 13px; display: inline-block; }
+          .badge-status { background: #f0fdf4; color: #16a34a; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 12px; }
           .text-link { color: var(--accent); text-decoration: none; }
           .text-link:hover { text-decoration: underline; }
           .empty-state { padding: 40px; text-align: center; color: var(--text-muted); font-size: 16px; }
         </style>
       </head>
       <body>
-
         <div class="sidebar">
-          <div class="sidebar-top">
-            <div class="sidebar-brand">SIL 2026</div>
-          </div>
+          <div class="sidebar-top"><div class="sidebar-brand">SIL 2026</div></div>
           <div class="admin-profile">
             <div class="stats-label">Logged in as:</div>
             <div class="admin-email" title="${req.user.emails[0].value}">${req.user.emails[0].value}</div>
             <a href="/logout" class="logout-btn">Logout</a>
           </div>
         </div>
-
         <div class="main-content">
-          <div class="header-row">
-            <h2>Recruitment Dashboard</h2>
-          </div>
-
+          <div class="header-row"><h2>Recruitment Dashboard</h2></div>
           <div class="stats-card">
             <div class="stats-label">Total Applications</div>
             <div class="stats-val">${result.rows.length}</div>
           </div>
-
           <div class="table-container">
             <table>
               <thead>
@@ -258,7 +242,6 @@ res.send(`
             </table>
           </div>
         </div>
-
       </body>
       </html>
     `);
