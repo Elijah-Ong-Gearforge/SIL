@@ -8,12 +8,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Aiven Database Connection (SSL Required)
+// Aiven Database Connection (SSL Fixed Configuration)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
     require: true,
-    rejectUnauthorized: false
+    rejectUnauthorized: false // This bypasses the self-signed certificate error
   }
 });
 
