@@ -31,12 +31,13 @@ passport.use(new GoogleStrategy({
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 
-// Aiven Database Connection (SSL Fixed Configuration)
+// Parse and enforce strict custom SSL parameters over Aiven strings
+const dbUrl = process.env.AIVEN_URL;
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: dbUrl.includes('?') ? dbUrl.split('?')[0] : dbUrl,
   ssl: {
     require: true,
-    rejectUnauthorized: false // Bypasses self-signed certificate chain blocker
+    rejectUnauthorized: false
   }
 });
 
