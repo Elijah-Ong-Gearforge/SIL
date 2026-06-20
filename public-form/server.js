@@ -20,19 +20,27 @@ const pool = new Pool({
 
 // Handle Form Submission
 app.post('/register', async (req, res) => {
-  const { full_name, email, school, discord_tag, phone_number, cleared_dates, languages, past_contests, past_works_workshops } = req.body;
+  const { 
+    full_name, school, school_email, academic_level, gender, 
+    noi_achievement, cence_courses, computing_qualification, 
+    skill_level, rules_agreed 
+  } = req.body;
   
   try {
     await pool.query(
       `INSERT INTO sil_applicants 
-      (full_name, email, school, discord_tag, phone_number, cleared_dates, languages, past_contests, past_works_workshops) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [full_name, email, school, discord_tag, phone_number, cleared_dates === 'true', languages, past_contests, past_works_workshops]
+      (full_name, school, school_email, academic_level, gender, noi_achievement, cence_courses, computing_qualification, skill_level, rules_agreed) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [
+        full_name, school, school_email, academic_level, gender, 
+        noi_achievement, cence_courses === 'true', computing_qualification, 
+        skill_level, rules_agreed === 'true'
+      ]
     );
     res.send(`
       <body style="font-family:sans-serif; text-align:center; padding-top:100px; background:#f3f4f6;">
-        <h1 style="color:#16a34a;">Application Submitted!</h1>
-        <p>Thanks for applying to the SIL 2026 team. We will be in touch via Discord.</p>
+        <h1 style="color:#16a34a;">Registration Complete!</h1>
+        <p>Thank you for registering for SIL 2026. Please check your school email for further instructions soon.</p>
       </body>
     `);
   } catch (err) {
