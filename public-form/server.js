@@ -8,12 +8,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Aiven Database Connection (SSL Fixed Configuration)
+// Parse and enforce strict custom SSL parameters over Aiven strings
+const dbUrl = process.env.AIVEN_URL;
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: dbUrl.includes('?') ? dbUrl.split('?')[0] : dbUrl,
   ssl: {
     require: true,
-    rejectUnauthorized: false // This bypasses the self-signed certificate error
+    rejectUnauthorized: false
   }
 });
 
