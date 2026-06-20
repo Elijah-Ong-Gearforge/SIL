@@ -37,11 +37,64 @@ app.post('/register', async (req, res) => {
         skill_level, rules_agreed === 'true'
       ]
     );
+
+    // Modern styled Thank You page response
     res.send(`
-      <body style="font-family:sans-serif; text-align:center; padding-top:100px; background:#f3f4f6;">
-        <h1 style="color:#16a34a;">Registration Complete!</h1>
-        <p>Thank you for registering for SIL 2026. Please check your school email for further instructions soon.</p>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Registration Submitted</title>
+        <style>
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #1e293b;
+          }
+          .card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.06);
+            text-align: center;
+            max-width: 450px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #e2e8f0;
+          }
+          .icon {
+            font-size: 48px;
+            color: #16a34a;
+            margin-bottom: 16px;
+          }
+          h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            color: #0f172a;
+          }
+          p {
+            font-size: 15px;
+            color: #64748b;
+            line-height: 1.6;
+            margin: 0;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <div class="icon">✓</div>
+          <h1>Thank You!</h1>
+          <p>Your registration for SIL 2026 has been successfully submitted. If selected, you will be sent an email regarding this shortly.</p>
+        </div>
       </body>
+      </html>
     `);
   } catch (err) {
     console.error(err);
