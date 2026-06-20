@@ -2,29 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>SIL 2026 Registration</title>
+  <title>SIL 2026 Comprehensive Registration</title>
   <style>
     body { font-family: -apple-system, sans-serif; background: #f3f4f6; display: flex; justify-content: center; padding: 40px 20px; }
-    .form-card { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); width: 100%; max-width: 550px; }
+    .form-card { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); width: 100%; max-width: 600px; }
     h2 { margin-bottom: 5px; color: #111827; }
     p { color: #6b7280; font-size: 14px; margin-bottom: 25px; }
-    .section-title { font-size: 18px; font-weight: bold; color: #2563eb; margin: 25px 0 15px 0; border-bottom: 2px solid #eff6ff; padding-bottom: 5px;}
+    .section-title { font-size: 18px; font-weight: bold; color: #2563eb; margin: 30px 0 15px 0; border-bottom: 2px solid #eff6ff; padding-bottom: 5px;}
     label { display: block; font-weight: 600; margin-bottom: 6px; color: #374151; font-size: 14px; }
     .help-text { font-size: 12px; color: #6b7280; margin-top: -4px; margin-bottom: 8px; display: block; }
-    input[type="text"], input[type="email"], select { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; }
-    .checkbox-group { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; background: #f8fafc; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; }
+    input[type="text"], input[type="email"], select, textarea { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; font-family: inherit; }
+    textarea { height: 80px; resize: vertical; }
+    .checkbox-group { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 15px; background: #f8fafc; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; }
     .checkbox-group input { margin-top: 4px; }
     .checkbox-group label { font-weight: normal; color: #1e293b; margin-bottom: 0; }
-    .rules-box { background: #fef2f2; border-color: #fca5a5; }
-    .rules-box label { color: #991b1b; font-weight: 500; }
-    button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px;}
+    button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px;}
     button:hover { background: #1d4ed8; }
   </style>
 </head>
 <body>
 <div class="form-card">
   <h2>SIL 2026 Registration</h2>
-  <p>Register for the Singapore Informatics League. Please fill out Member #1 details below.</p>
+  <p>Please provide all the required candidate profile details below for Member #1.</p>
   
   <form action="/register" method="POST">
     <div class="section-title">Basic Info</div>
@@ -34,10 +33,6 @@
     
     <label>School</label> 
     <input type="text" name="school" required>
-    
-    <label>School Email</label> 
-    <span class="help-text">Ensure that this email can be accessed during the contest.</span>
-    <input type="email" name="school_email" required>
     
     <label>Academic Level</label>
     <select name="academic_level" required>
@@ -58,7 +53,25 @@
       <option value="Female">Female</option>
     </select>
 
-    <div class="section-title">Prior Experience</div>
+    <div class="section-title">Contact & Communication</div>
+
+    <label>Personal Email Address</label> 
+    <input type="email" name="email" required>
+
+    <label>School Email Address</label> 
+    <span class="help-text">Ensure that this email can be accessed during the contest environment.</span>
+    <input type="email" name="school_email" required>
+
+    <label>Discord Tag</label> 
+    <input type="text" name="discord_tag" placeholder="e.g., username or name#0000" required>
+
+    <label>Phone Number</label> 
+    <input type="text" name="phone_number">
+
+    <div class="section-title">Technical Experience & Logistics</div>
+
+    <label>Programming Languages Known</label>
+    <input type="text" name="languages" placeholder="e.g., C++, Python, Java" required>
 
     <label>Highest NOI Achievement</label>
     <select name="noi_achievement" required>
@@ -81,14 +94,20 @@
       <option value="Advanced">Advanced (Competitive programmer)</option>
     </select>
 
+    <label>Past Contests Participated In</label>
+    <textarea name="past_contests" placeholder="List details or type 'None'"></textarea>
+
+    <label>Past Relevant Works or Workshops</label>
+    <textarea name="past_works_workshops" placeholder="List details or type 'None'"></textarea>
+
     <div class="checkbox-group">
       <input type="checkbox" id="cence" name="cence_courses" value="true">
       <label for="cence">I have participated in CeNCE courses before.</label>
     </div>
 
-    <div class="checkbox-group rules-box">
-      <input type="checkbox" id="rules" name="rules_agreed" value="true" required>
-      <label for="rules">I have read and understood the contest rules, and I agree not to seek external help or use generative AI tools during the contest.</label>
+    <div class="checkbox-group">
+      <input type="checkbox" id="dates" name="cleared_dates" value="true" required>
+      <label for="dates">I confirm that my calendar is clear for all official contest schedules and dates.</label>
     </div>
 
     <button type="submit">Submit Registration</button>
