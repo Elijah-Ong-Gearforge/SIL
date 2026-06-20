@@ -41,15 +41,25 @@ const pool = new Pool({
   }
 });
 
-// Middleware to check if it is YOUR email
+// Middleware to check if the user is an authorized admin
 const isAdmin = (req, res, next) => {
-  if (req.isAuthenticated() && req.user.emails[0].value === process.env.ADMIN_EMAIL) {
-    return next();
+  // Get the list of admin emails from environment variables, split by commas, and trim whitespace
+  const allowedAdmins = (process.env.ADMIN_EMAILS || '')
+    .split(',')
+    .map(email => email.trim().toLowerCase());
+
+  if (req.isAuthenticated() && req.user.emails && req.user.emails[0]) {
+    const userEmail = req.user.emails[0].value.toLowerCase();
+    
+    if (allowedAdmins.includes(userEmail)) {
+      return next();
+    }
   }
+  
   res.status(403).send(`
     <body style="font-family:sans-serif; text-align:center; padding-top:100px; background:#f8fafc; color:#1e293b;">
       <h1 style="color:#dc2626; font-size:48px; margin-bottom:10px;">403 Forbidden</h1>
-      <p style="font-size:18px; color:#64748b;">You are not the authorized admin for this dashboard.</p>
+      <p style="font-size:18px; color:#64748b;">You are not an authorized admin for this dashboard.</p>
       <p><a href="/auth/google" style="color:#2563eb; text-decoration:none; font-weight:600;">Click here to Switch Accounts</a></p>
     </body>
   `);
