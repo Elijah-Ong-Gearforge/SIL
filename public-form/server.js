@@ -18,23 +18,23 @@ const pool = new Pool({
   }
 });
 
-// Handle Form Submission
+// Handle All-In-One Form Submission
 app.post('/register', async (req, res) => {
   const { 
-    full_name, school, school_email, academic_level, gender, 
-    noi_achievement, cence_courses, computing_qualification, 
-    skill_level, rules_agreed 
+    full_name, email, school_email, school, academic_level, gender, 
+    discord_tag, phone_number, cleared_dates, languages, noi_achievement, 
+    cence_courses, computing_qualification, skill_level, past_contests, past_works_workshops 
   } = req.body;
   
   try {
     await pool.query(
       `INSERT INTO sil_applicants 
-      (full_name, school, school_email, academic_level, gender, noi_achievement, cence_courses, computing_qualification, skill_level, rules_agreed) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      (full_name, email, school_email, school, academic_level, gender, discord_tag, phone_number, cleared_dates, languages, noi_achievement, cence_courses, computing_qualification, skill_level, past_contests, past_works_workshops) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
       [
-        full_name, school, school_email, academic_level, gender, 
-        noi_achievement, cence_courses === 'true', computing_qualification, 
-        skill_level, rules_agreed === 'true'
+        full_name, email, school_email, school, academic_level, gender, 
+        discord_tag, phone_number, cleared_dates === 'true', languages, noi_achievement, 
+        cence_courses === 'true', computing_qualification, skill_level, past_contests, past_works_workshops
       ]
     );
 
