@@ -133,12 +133,11 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Dashboard Route (Beautiful SaaS Layout)
+// Dashboard Route (Beautiful SaaS Layout with Full Dataset)
 app.get('/dashboard', isAdmin, async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM sil_applicants ORDER BY applied_at DESC');
     
-    // Map data rows with beautiful structural formatting for the NEW columns
     let rows = result.rows.map(app => `
       <tr>
         <td>
@@ -146,16 +145,30 @@ app.get('/dashboard', isAdmin, async (req, res) => {
           <span style="font-size: 12px; color: var(--text-muted);">${app.academic_level} • ${app.gender}</span>
         </td>
         <td>
-          ${app.school}<br>
-          <a href="mailto:${app.school_email}" class="text-link" style="font-size: 13px;">${app.school_email}</a>
+          <span style="font-size: 12px; font-weight:600; color:var(--text-muted);">SCH:</span> <a href="mailto:${app.school_email}" class="text-link">${app.school_email}</a><br>
+          <span style="font-size: 12px; font-weight:600; color:var(--text-muted);">PERS:</span> <a href="mailto:${app.email}" class="text-link">${app.email}</a>
         </td>
         <td>
-          <span style="font-weight:600; color:#0f172a;">${app.noi_achievement}</span><br>
-          <span style="font-size: 12px; color: var(--text-muted);">CeNCE: ${app.cence_courses ? 'Yes' : 'No'}</span>
+          <strong style="color: #0f172a;">${app.school}</strong><br>
+          <span style="font-size: 12px; color: var(--text-muted);">${app.phone_number || 'No Phone'}</span>
         </td>
-        <td><code style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-weight:500; color:#0f172a;">${app.skill_level}</code></td>
-        <td style="font-size: 13px; color: var(--text-dark);">${app.computing_qualification}</td>
-        <td><span class="badge-status">✓ Agreed</span></td>
+        <td>
+          <span class="badge-discord">${app.discord_tag}</span>
+        </td>
+        <td>
+          <span style="font-weight:600; color:#1e3a8a;">NOI: ${app.noi_achievement}</span><br>
+          <span style="font-size: 12px; color: var(--text-muted);">CeNCE: ${app.cence_courses ? 'Yes' : 'No'}</span><br>
+          <span style="font-size: 12px; color: var(--text-muted);">Qual: ${app.computing_qualification}</span>
+        </td>
+        <td>
+          <code style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-weight:600; font-size:12px; color:#0f172a;">${app.skill_level}</code><br>
+          <span style="font-size:12px; color:var(--text-muted); display:inline-block; margin-top:4px;">${app.languages}</span>
+        </td>
+        <td style="max-width: 200px; font-size: 12px; color: var(--text-dark); max-height:100px; overflow-y:auto; white-space:pre-line;">${app.past_contests || 'None'}</td>
+        <td style="max-width: 200px; font-size: 12px; color: var(--text-dark); max-height:100px; overflow-y:auto; white-space:pre-line;">${app.past_works_workshops || 'None'}</td>
+        <td>
+          ${app.cleared_dates ? '<span class="badge-status">✓ Cleared</span>' : '<span style="color:#dc2626; font-weight:bold;">✗ No</span>'}
+        </td>
       </tr>
     `).join('');
 
@@ -198,13 +211,13 @@ app.get('/dashboard', isAdmin, async (req, res) => {
           }
           .stats-label { font-size: 14px; color: var(--text-muted); font-weight: 500; }
           .stats-val { font-size: 32px; font-weight: 700; color: var(--accent); margin-top: 4px; }
-          .table-container { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); overflow: hidden; }
-          table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-          th { background: #f1f5f9; padding: 16px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border); }
-          td { padding: 16px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+          .table-container { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); overflow-x: auto; }
+          table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 1200px; }
+          th { background: #f1f5f9; padding: 14px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+          td { padding: 14px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.4; }
           tr:last-child td { border-bottom: none; }
           tr:hover { background: #f8fafc; }
-          .badge-discord { background: #eef2ff; color: #4338ca; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 13px; display: inline-block; }
+          .badge-discord { background: #eef2ff; color: #4338ca; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 12px; display: inline-block; }
           .badge-status { background: #f0fdf4; color: #16a34a; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 12px; }
           .text-link { color: var(--accent); text-decoration: none; }
           .text-link:hover { text-decoration: underline; }
@@ -230,16 +243,19 @@ app.get('/dashboard', isAdmin, async (req, res) => {
             <table>
               <thead>
                 <tr>
-                  <th>Applicant Details</th>
-                  <th>School & Email</th>
-                  <th>NOI & CeNCE</th>
-                  <th>Skill Level</th>
-                  <th>Computing Quals</th>
-                  <th>AI Rules</th>
+                  <th>Applicant</th>
+                  <th>Email Records</th>
+                  <th>School & Contact</th>
+                  <th>Discord</th>
+                  <th>Qualifications</th>
+                  <th>Skills & Langs</th>
+                  <th>Past Contests</th>
+                  <th>Workshops/Works</th>
+                  <th>Dates</th>
                 </tr>
               </thead>
               <tbody>
-                ${rows.length > 0 ? rows : '<tr><td colspan="6" class="empty-state">No applications received yet.</td></tr>'}
+                ${rows.length > 0 ? rows : '<tr><td colspan="9" class="empty-state">No applications received yet.</td></tr>'}
               </tbody>
             </table>
           </div>
