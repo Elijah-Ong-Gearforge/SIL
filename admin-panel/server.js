@@ -138,22 +138,24 @@ app.get('/dashboard', isAdmin, async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM sil_applicants ORDER BY applied_at DESC');
     
-    // Map data rows with beautiful structural formatting
+    // Map data rows with beautiful structural formatting for the NEW columns
     let rows = result.rows.map(app => `
       <tr>
         <td>
           <strong style="font-size: 15px; color: var(--text-dark);">${app.full_name}</strong><br>
-          <a href="mailto:${app.email}" class="text-link" style="font-size: 13px;">${app.email}</a>
+          <span style="font-size: 12px; color: var(--text-muted);">${app.academic_level} • ${app.gender}</span>
         </td>
-        <td>${app.school}</td>
         <td>
-          <span class="badge-discord">${app.discord_tag}</span><br>
-          <span style="font-size: 12px; color: var(--text-muted); display:inline-block; margin-top:4px;">${app.phone_number || 'No Phone'}</span>
+          ${app.school}<br>
+          <a href="mailto:${app.school_email}" class="text-link" style="font-size: 13px;">${app.school_email}</a>
         </td>
-        <td><code style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-weight:500; color:#0f172a;">${app.languages}</code></td>
-        <td style="max-width: 220px; font-size: 13px; color: var(--text-dark);">${app.past_contests ? app.past_contests.replace(/\n/g, '<br>') : '<span style="color:#9ca3af;">None</span>'}</td>
-        <td style="max-width: 220px; font-size: 13px; color: var(--text-dark);">${app.past_works_workshops ? app.past_works_workshops.replace(/\n/g, '<br>') : '<span style="color:#9ca3af;">None</span>'}</td>
-        <td><span class="badge-status">✓ Cleared</span></td>
+        <td>
+          <span style="font-weight:600; color:#0f172a;">${app.noi_achievement}</span><br>
+          <span style="font-size: 12px; color: var(--text-muted);">CeNCE: ${app.cence_courses ? 'Yes' : 'No'}</span>
+        </td>
+        <td><code style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-weight:500; color:#0f172a;">${app.skill_level}</code></td>
+        <td style="font-size: 13px; color: var(--text-dark);">${app.computing_qualification}</td>
+        <td><span class="badge-status">✓ Agreed</span></td>
       </tr>
     `).join('');
 
@@ -229,16 +231,15 @@ app.get('/dashboard', isAdmin, async (req, res) => {
               <thead>
                 <tr>
                   <th>Applicant Details</th>
-                  <th>School</th>
-                  <th>Discord & Contact</th>
-                  <th>Languages</th>
-                  <th>Past Contests</th>
-                  <th>Works & Workshops</th>
-                  <th>Availability</th>
+                  <th>School & Email</th>
+                  <th>NOI & CeNCE</th>
+                  <th>Skill Level</th>
+                  <th>Computing Quals</th>
+                  <th>AI Rules</th>
                 </tr>
               </thead>
               <tbody>
-                ${rows.length > 0 ? rows : '<tr><td colspan="7" class="empty-state">No applications received yet.</td></tr>'}
+                ${rows.length > 0 ? rows : '<tr><td colspan="6" class="empty-state">No applications received yet.</td></tr>'}
               </tbody>
             </table>
           </div>
